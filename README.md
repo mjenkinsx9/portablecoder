@@ -235,7 +235,7 @@ scripts/pcoder doctor
 
 ## 🤝 Contributing
 
-Issues and PRs welcome. Before submitting: `npm test`, `npx prettier --check "scripts/**/*.cjs" "tests/**/*.cjs"`, and make sure `scripts/pcoder doctor` passes. PRs get an automated review plus the full CI gate.
+Issues and PRs welcome. Before submitting: `npm test`, `npx prettier --check "scripts/**/*.cjs" "tests/**/*.cjs"`, and make sure `scripts/pcoder doctor` passes. PRs run through the full CI gate.
 
 ## 📄 License
 
