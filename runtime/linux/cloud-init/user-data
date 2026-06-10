@@ -1,0 +1,17 @@
+#cloud-config
+users:
+  - name: portable
+    shell: /bin/bash
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    lock_passwd: true
+    groups:
+      - sudo
+    ssh_authorized_keys:
+      - <SSH_PUBLIC_KEY_PLACEHOLDER>
+ssh_pwauth: false
+
+package_update: true
+
+runcmd:
+  - apt-get install -y nodejs npm
+  - npm install -g @openai/codex @anthropic-ai/claude-code

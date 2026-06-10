@@ -1,0 +1,118 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    name: Lint & Format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Prettier check
+        run: npx --yes prettier --check "scripts/**/*.cjs" "scripts/**/*.json" "tests/**/*.cjs" "package.json"
+
+      - name: ShellCheck
+        uses: ludeeus/action-shellcheck@2.0.0
+        with:
+          scandir: scripts/
+
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install gitleaks
+        run: |
+          VERSION=$(curl -sSf https://api.github.com/repos/gitleaks/gitleaks/releases/latest | grep -oP '"tag_name":\s*"v\K[^"]+')
+          curl -sSfL "https://github.com/gitleaks/gitleaks/releases/latest/download/gitleaks_${VERSION}_linux_x64.tar.gz" | tar xz
+          sudo mv gitleaks /usr/local/bin/
+
+      - name: Gitleaks
+        run: gitleaks detect --source . --verbose
+
+  test:
+    name: Test & Validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Validate launcher syntax
+        run: node --check scripts/pcoder.cjs
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Initialize settings
+        run: scripts/pcoder setup --init
+
+      - name: Bootstrap host-native runtime (both tools)
+        run: scripts/pcoder runtime bootstrap-host-native --tool all
+
+      - name: Doctor check
+        run: scripts/pcoder doctor
+
+      - name: Smoke test
+        run: scripts/runtime/linux/smoke-check.sh
+
+  claude-review:
+    name: Claude Code Review
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    permissions:
+      contents: read
+      pull-requests: write
+      id-token: write
+    steps:
+      # Secrets are not readable in job-level `if`, so probe in a step and
+      # skip the review (job still green) when the token isn't configured.
+      - name: Check for OAuth token
+        id: token
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+        run: |
+          if [ -n "$CLAUDE_CODE_OAUTH_TOKEN" ]; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "CLAUDE_CODE_OAUTH_TOKEN secret not set; skipping Claude review."
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.token.outputs.available == 'true'
+        with:
+          fetch-depth: 0
+
+      - name: Claude Code Review
+        if: steps.token.outputs.available == 'true'
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          claude_args: --model claude-sonnet-4-6
+          prompt: |
+            Review this PR for:
+            - Security issues (especially in launcher scripts)
+            - Logic errors and edge cases
+            - Error handling gaps
+            - JavaScript/Node.js best practices
+            - Cross-platform compatibility (Windows/Linux/macOS)
+            - Adherence to existing code patterns in the repo
+
+            Focus on substantive issues. Skip minor style comments that linters would catch.

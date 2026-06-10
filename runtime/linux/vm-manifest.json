@@ -1,0 +1,25 @@
+{
+  "backend": "bundled-qemu",
+  "guest_os": "ubuntu-lts",
+  "guest_version": "24.04-lts",
+  "image_path": "runtime/linux/images/ubuntu.qcow2",
+  "qemu_binary_path": "runtime/qemu/qemu-system-x86_64.exe",
+  "acceleration_policy": {
+    "primary": "whpx",
+    "fallback": "tcg",
+    "strategy": "auto"
+  },
+  "default_memory_mb": 4096,
+  "default_vcpu": 2,
+  "ssh_forward_port": "dynamic",
+  "project_sync_strategy": "scp_bidirectional_default",
+  "workspace_mount": "not_required_for_mvp",
+  "bootstrap": {
+    "windows": {
+      "qemu_installer_url": "https://qemu.weilnetz.de/w64/qemu-w64-setup-20260324.exe",
+      "qemu_installer_sha512_url": "https://qemu.weilnetz.de/w64/qemu-w64-setup-20260324.sha512",
+      "ubuntu_image_url": "https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-amd64.img",
+      "ubuntu_image_sha256sums_url": "https://cloud-images.ubuntu.com/noble/current/SHA256SUMS"
+    }
+  }
+}

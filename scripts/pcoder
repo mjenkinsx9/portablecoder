@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+PORTABLE_NODE="${REPO_ROOT}/runtime/node/bin/node"
+PORTABLE_NODE_FLAT="${REPO_ROOT}/runtime/node/node"
+
+if [[ -x "${PORTABLE_NODE}" ]]; then
+  exec "${PORTABLE_NODE}" "${SCRIPT_DIR}/pcoder.cjs" "$@"
+elif [[ -x "${PORTABLE_NODE_FLAT}" ]]; then
+  exec "${PORTABLE_NODE_FLAT}" "${SCRIPT_DIR}/pcoder.cjs" "$@"
+fi
+
+if command -v node >/dev/null 2>&1; then
+  exec node "${SCRIPT_DIR}/pcoder.cjs" "$@"
+fi
+
+echo "Error: node not found. Bundle runtime/node or install node in PATH." >&2
+exit 1

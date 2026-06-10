@@ -1,0 +1,10 @@
+{
+  "name": "portablecoder",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Portable launcher for AI coding CLIs (Claude Code, OpenAI Codex)",
+  "license": "MIT",
+  "scripts": {
+    "test": "node --test tests/*.cjs"
+  }
+}

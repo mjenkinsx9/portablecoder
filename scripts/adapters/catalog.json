@@ -1,0 +1,34 @@
+{
+  "claude": {
+    "display_name": "Claude Code CLI",
+    "command_env": "PCODER_CLAUDE_CMD",
+    "candidate_commands": ["claude"],
+    "npm_package": "@anthropic-ai/claude-code",
+    "runtime_subdir": "claude",
+    "bin_name": "claude",
+    "config_dir_name": ".claude",
+    "config_dir_env": "CLAUDE_CONFIG_DIR",
+    "auth_env_vars": ["ANTHROPIC_API_KEY", "ANTHROPIC_AUTH_TOKEN", "ANTHROPIC_BASE_URL"],
+    "api_key_env": "ANTHROPIC_API_KEY",
+    "api_key_alias_env": "ANTHROPIC_AUTH_TOKEN",
+    "supports_oauth_login": true,
+    "vm_supported": true,
+    "update_args": ["--update", "--upgrade", "update", "upgrade"]
+  },
+  "codex": {
+    "display_name": "OpenAI Codex CLI",
+    "command_env": "PCODER_CODEX_CMD",
+    "candidate_commands": ["codex"],
+    "npm_package": "@openai/codex",
+    "runtime_subdir": "codex",
+    "bin_name": "codex",
+    "config_dir_name": ".codex",
+    "config_dir_env": "CODEX_HOME",
+    "auth_env_vars": ["OPENAI_API_KEY", "OPENAI_BASE_URL"],
+    "api_key_env": "OPENAI_API_KEY",
+    "api_key_alias_env": null,
+    "supports_oauth_login": true,
+    "vm_supported": false,
+    "update_args": ["--self-update", "update", "upgrade"]
+  }
+}
